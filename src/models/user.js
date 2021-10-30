@@ -18,12 +18,19 @@ const userSchema = new mongoose.Schema({
     require: true,
     trim: true,
   },
-  products: [
+  isAdmin:{
+    type:Boolean,
+    requre:true,
+    default: false, 
+  },
+
+  subject_comments: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
+      ref: "Subject",
     },
   ],
+  
   carts: [
     {
       type: mongoose.Schema.Types.ObjectId,

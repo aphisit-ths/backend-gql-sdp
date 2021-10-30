@@ -16,9 +16,7 @@ const server = new ApolloServer({
         const token = req.headers.authorization || "" 
         //Extract user id from token
         const userId = getUser(token)
-        
         return {userId}
-        
     }
 })
 

@@ -1,30 +1,85 @@
 type Query {
-  
   user: User
   users: [User]!
   product(id: ID!): Product
   products: [Product]!
+
+  # New Project
+  subjects:[Subject]!
+  subject (id:ID!):Subject
+  
+  subjectComments:[SubjectComment]!
+  subjectComment (id:ID!):SubjectComment
 }
 
 type Mutation {
-  login(email:String!,password:String!):AuthData
+  login(email: String!, password: String!): AuthData
   signup(name: String!, email: String!, password: String!): User
   createProduct(desc: String!, price: Float!, imgUrl: String!): Product!
   addToCart(id: ID!): CartItem!
   updateProduct(id: ID!, desc: String, price: Float, imgUrl: String): Product!
-  deleteProduct(id:ID!):Product!
-  deleteCart(id:ID!):CartItem!
+  deleteProduct(id: ID!): Product!
+  deleteCart(id: ID!): CartItem!
+  addSubject(
+    course_id: String!
+    eng_name: String!
+    thai_name: String!
+  ): Subject!
+  deleteSubject(id: ID!): Subject!
+  addSubjectComment(
+    subjectId: ID!
+    comment: String!
+    grade: String!
+    year: String!
+    semester: String!
+    section: String!
+    homework_rate: Int!
+    content_rate: Int!
+    lecturer_rate: Int!
+  ): SubjectComment!
+  deleteComment(id: ID!): SubjectComment!
 }
 
 scalar Date
+
 type User {
   id: ID!
   name: String!
   email: String!
   password: String!
+  isAdmin: Boolean!
+  subjectComments: [SubjectComment]!
   products: [Product]
   carts: [CartItem]!
   createdAt: Date!
+}
+
+type Subject {
+  id: ID!
+  course_id: String!
+  eng_name: String!
+  thai_name: String!
+  comments: [SubjectComment]!
+  isAllowed: Boolean!
+  createdAt: Date!
+  homework_rate: [Int]!
+  content_rate: [Int]!
+  lecturer_rate: [Int]!
+}
+
+type SubjectComment {
+  id: ID!
+  subjectId: Subject!
+  comment: String!
+  grade: String!
+  year: String!
+  semester: String!
+  section: String!
+  owner: User!
+  createdAt: Date!
+  homework_rate: Int!
+  content_rate: Int!
+  lecturer_rate: Int!
 }
 
 type Product {
@@ -45,6 +100,6 @@ type CartItem {
 }
 
 type AuthData {
-  user:User
-  jwt:String
+  user: User
+  jwt: String
 }

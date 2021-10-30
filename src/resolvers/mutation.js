@@ -1,6 +1,8 @@
 import Product from "../models/product";
 import bcrypt from "bcryptjs";
 import User from "../models/user";
+import SubjectComment from "../models/subject_comment";
+import Subject from "../models/subject";
 import CartItem from "../models/cartItem";
 import jwt from "jsonwebtoken";
 
@@ -8,12 +10,13 @@ const Mutation = {
   login: async (parent, args, context, info) => {
     const { email, password } = args;
     //find user in database
-    const user = await User.findOne({ email }).populate({
-      path: "products",
-      populate: { path: "user" },
-    })
-    .populate({ path: "carts", populate: { path: "product" } });;
-    if (!user) throw new Error("email not found, please sign up .");
+    const user = await User.findOne({ email })
+      .populate({
+        path: "products",
+        populate: { path: "user" },
+      })
+      .populate({ path: "carts", populate: { path: "product" } });
+    if (!user) throw new Error("Invalid email or password.");
     //Compare Password
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) throw new Error("Invalid email or password.");
@@ -22,7 +25,7 @@ const Mutation = {
       expiresIn: "7days",
     });
     return { user, jwt: token };
-  }, 
+  },
   signup: async (parent, args, context, info) => {
     //Trim and Lower Case email
     const email = args.email.trim().toLowerCase();
@@ -30,7 +33,6 @@ const Mutation = {
     const currentUsers = await User.find({});
     const isEmailExist =
       currentUsers.findIndex((user) => user.email === email) > -1;
-
     if (isEmailExist) {
       throw new Error("email already exist.");
     }
@@ -43,16 +45,14 @@ const Mutation = {
     const password = await bcrypt.hash(args.password, 10);
     return User.create({ ...args, email, password });
   },
-  createProduct: async (parent, args, {userId}, info) => {
-    //Check if user logged in 
-    if(!userId) throw new Error("please, log in .")
-
+  createProduct: async (parent, args, { userId }, info) => {
+    //Check if user logged in
+    if (!userId) throw new Error("please, log in .");
     if (!args.desc || !args.price || !args.imgUrl) {
-      throw new Errors("plase provide all required fields");
+      throw new Error("please provide all required fields");
     }
     const product = await Product.create({ ...args, user: userId });
     const user = await User.findById(userId);
-
     if (!user.products) {
       user.products = [product];
     } else {
@@ -65,12 +65,11 @@ const Mutation = {
       populate: { path: "products" },
     });
   },
-  addToCart: async (parent, args, {userId}, info) => {
+  addToCart: async (parent, args, { userId }, info) => {
     //Id --> product ID Cart ID
     const { id } = args;
-    if(!userId) throw new Error("please, log in .")
+    if (!userId) throw new Error("please, log in .");
     try {
-      
       //1.find User who perform item to cart ? ---> from loggedin ?
 
       const user = await User.findById(userId).populate({
@@ -123,11 +122,10 @@ const Mutation = {
       console.log(error);
     }
   },
-  updateProduct: async (parent, args, {userId}, info) => {
-    if(!userId) throw new Error("please, log in .")
+  updateProduct: async (parent, args, { userId }, info) => {
+    if (!userId) throw new Error("please, log in .");
 
     const { id, desc, price, imgUrl } = args;
-    
 
     //find product in database
     const product = await Product.findById(id);
@@ -135,7 +133,6 @@ const Mutation = {
     const ownerProduct = product.user;
 
     //Check if user is the owner of the product ?
-    
 
     if (userId !== ownerProduct.toString()) {
       throw new Error("You are not authorized.");
@@ -157,8 +154,8 @@ const Mutation = {
 
     return updatedProduct;
   },
-  deleteProduct: async (parent, args, {userId}, info) => {
-    if(!userId) throw new Error("please, log in .")
+  deleteProduct: async (parent, args, { userId }, info) => {
+    if (!userId) throw new Error("please, log in .");
     const { id } = args;
     const product = await Product.findById(id);
     const ownerProduct = product.user.toString();
@@ -177,8 +174,8 @@ const Mutation = {
     await user.save();
     return deletedProduct;
   },
-  deleteCart: async (parent, args, {userId}, info) => {
-    if(!userId) throw new Error("please, log in .")
+  deleteCart: async (parent, args, { userId }, info) => {
+    if (!userId) throw new Error("please, log in .");
     const { id } = args;
 
     //Find Cart form id in database
@@ -200,6 +197,86 @@ const Mutation = {
     );
     await User.findByIdAndUpdate(userId, { carts: updatedUserCarts });
     return deletedCart;
+  },
+
+  addSubject: async (parent, args, context, info) => {
+    const userId = "6148b1fc5d04582b38612c7e";
+    const { course_id, eng_name, thai_name } = args;
+    if (!userId) throw new Error("please, log in .");
+
+    //check course id is already exit?
+    const currentSubject = await Subject.find({});
+    const isCourseIdExisted =
+      currentSubject.findIndex((subject) => subject.course_id === course_id) >  -1;
+
+    if (isCourseIdExisted) throw new Error("this course id is already exist");
+
+    if (!course_id || !eng_name || !thai_name) {
+      throw new Error("please ! provide all fields");
+    }
+    const subject = await Subject.create({ ...args ,isAllowed:true});
+    return Subject.findById(subject.id)
+  },
+
+  addSubjectComment: async (parent, args, context, info) => {
+    const userId = "6148b1fc5d04582b38612c7e";
+    //Id คือ Course id
+    const { subjectId, comment, grade, semester, year, section } = args;
+    if (!userId) throw new Error("please, log in .");
+
+    if (!subjectId || !comment || !grade || !semester || !year || !section) {
+      throw new Error("please provide all required fields");
+    }
+
+    const currentSubjects = await Subject.find({})
+    const isExitSubject = await currentSubjects.findIndex((subject) => subject.id === subjectId) > -1;
+    if(!isExitSubject) throw new Error ("This course does not exist ?! ")
+    
+    const commented = await SubjectComment.create({ ...args, owner: userId });
+    const user = await User.findById(userId);
+
+    if (!user.comments) {
+      user.comments = [commented];
+    } else {
+      user.comments.push(commented);
+    }
+    user.save();
+
+    const subject = await Subject.findById(subjectId);
+  
+    if  (!subject.comments) {
+      subject.comments = [commented];
+    } else {
+      subject.comments.push(commented);
+    }
+    
+
+    //add homework_rate to Subject
+    if (!subject.homework_rate) {
+      subject.homework_rate = [args.homework_rate];
+    } else {
+      subject.homework_rate.push(args.homework_rate);
+    }
+
+    //add homework_rate to Subject
+    if (!subject.content_rate) {
+      subject.content_rate = [args.content_rate];
+    } else {
+      subject.content_rate.push(args.content_rate);
+    }
+    
+    //add homework_rate to Subject
+    if (!subject.lecturer_rate) {
+      subject.lecturer_rate = [args.lecturer_rate];
+    } else {
+      subject.lecturer_rate.push(args.lecturer_rate);
+    }
+     subject.save();
+
+    const success = await SubjectComment.findById(commented.id)
+      .populate({ path: "subjectId", populate: { path: "comments" } })
+      .populate({ path: "owner", populate: { path: "comments" } });
+    return success;
   },
 };
 
