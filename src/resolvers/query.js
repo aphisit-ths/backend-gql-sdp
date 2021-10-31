@@ -46,7 +46,7 @@ const Query = {
   subject: (parent, args, context, info) =>
     Subject.findById(args.id)
       .populate({
-        path: "comments",
+        path: "comments",populate: {path:"owner"}
       }),
       
   subjectComments: (parent, args, context, info) =>

@@ -48,7 +48,7 @@ type User {
   email: String!
   password: String!
   isAdmin: Boolean!
-  subjectComments: [SubjectComment]!
+  subject_comments: [SubjectComment]!
   products: [Product]
   carts: [CartItem]!
   createdAt: Date!

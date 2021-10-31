@@ -27,16 +27,11 @@ const userSchema = new mongoose.Schema({
   subject_comments: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Subject",
+      ref: "SubjectComment",
     },
   ],
   
-  carts: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "CartItem",
-    },
-  ],
+  
   createdAt: { 
       type: Date, 
       require: true, 

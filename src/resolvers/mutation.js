@@ -233,12 +233,13 @@ const Mutation = {
     if(!isExitSubject) throw new Error ("This course does not exist ?! ")
     
     const commented = await SubjectComment.create({ ...args, owner: userId });
+
     const user = await User.findById(userId);
 
-    if (!user.comments) {
-      user.comments = [commented];
+    if (!user.subject_comments) {
+      user.subject_comments = [commented];
     } else {
-      user.comments.push(commented);
+      user.subject_comments.push(commented);
     }
     user.save();
 
@@ -250,7 +251,7 @@ const Mutation = {
       subject.comments.push(commented);
     }
     
-
+    
     //add homework_rate to Subject
     if (!subject.homework_rate) {
       subject.homework_rate = [args.homework_rate];
