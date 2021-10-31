@@ -16,11 +16,7 @@ const SubjectCommentSchema = new mongoose.Schema({
         require:true,
         trim:true
     },
-    semester:{
-        type:String,
-        require:true,
-        trim:true
-    },
+    
     section:{
         type:String,
         require:true,

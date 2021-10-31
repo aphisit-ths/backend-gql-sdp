@@ -73,7 +73,6 @@ type SubjectComment {
   comment: String!
   grade: String!
   year: String!
-  semester: String!
   section: String!
   owner: User!
   createdAt: Date!
