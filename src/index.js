@@ -5,13 +5,13 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 //Strart  Server
-
-const {DB_NAME,DB_PASSWORD,DB_USER,PORT} = process.env
+const PORT = process.env.PORT || 4444
+const DATABASE_URL= process.env.DATABASE_URL
 
 const createServer = async () => {
   try {
     await mongoose.connect(
-      `mongodb+srv://${DB_USER}:${DB_PASSWORD}@graphql-101.grzjp.mongodb.net/${DB_NAME}?retryWrites=true&w=majority`,
+      DATABASE_URL,
       { useNewUrlParser: true,
         useFindAndModify: false,
         useUnifiedTopology: true,
@@ -21,9 +21,12 @@ const createServer = async () => {
     const app = express();
     await server.start();
     server.applyMiddleware({ app });
+    
+    app.get("/",(req ,res) =>{
+      res.json({result:"ok"})
+    })
 
-
-    app.listen({ port: process.env.PORT || 4444 }, () =>
+    app.listen({ port: PORT }, () =>
       console.log(
         `server ready at http://localhost:${PORT}${server.graphqlPath}`
       )
