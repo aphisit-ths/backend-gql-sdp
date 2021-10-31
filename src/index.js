@@ -22,14 +22,8 @@ const createServer = async () => {
     await server.start();
     server.applyMiddleware({ app });
 
-    // app.listen({ port: PORT || 4444 }).then(({ url }) => {
-    //   console.log(`
-    //     🚀  Server is ready at ${url}
-    //     📭  Query at https://studio.apollographql.com/dev
-    //   `);
-    // });
 
-    app.listen({ port: PORT || 4000 }, () =>
+    app.listen({ port: process.env.PORT || 4444 }, () =>
       console.log(
         `server ready at http://localhost:${PORT}${server.graphqlPath}`
       )
