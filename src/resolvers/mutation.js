@@ -221,10 +221,10 @@ const Mutation = {
   addSubjectComment: async (parent, args, context, info) => {
     const userId = "6148b1fc5d04582b38612c7e";
     //Id คือ Course id
-    const { subjectId, comment, grade, semester, year, section } = args;
+    const { subjectId, comment, grade,  year, section } = args;
     if (!userId) throw new Error("please, log in .");
 
-    if (!subjectId || !comment || !grade || !semester || !year || !section) {
+    if (!subjectId || !comment || !grade  || !year || !section) {
       throw new Error("please provide all required fields");
     }
 
