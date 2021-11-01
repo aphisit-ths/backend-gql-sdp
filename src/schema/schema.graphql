@@ -31,7 +31,6 @@ type Mutation {
     comment: String!
     grade: String!
     year: String!
-    semester: String!
     section: String!
     homework_rate: Int!
     content_rate: Int!
