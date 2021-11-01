@@ -218,8 +218,7 @@ const Mutation = {
     return Subject.findById(subject.id)
   },
 
-  addSubjectComment: async (parent, args, context, info) => {
-    const userId = "6148b1fc5d04582b38612c7e";
+  addSubjectComment: async (parent, args, { userId }, info) => {
     //Id คือ Course id
     const { subjectId, comment, grade,  year, section } = args;
     if (!userId) throw new Error("please, log in .");

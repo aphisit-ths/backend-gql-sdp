@@ -52,7 +52,7 @@ const Query = {
   subjectComments: (parent, args, context, info) =>
     SubjectComment.find({})
     .populate({path: "owner",})
-    .populate({ path: "subjectId"}),
+    .populate({ path: "subjectId"}).sort({createdAt:-1}),
 };
 
 
