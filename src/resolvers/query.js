@@ -21,20 +21,21 @@ const Query = {
   users: (parent, args, context, info) =>
     User.find({})
       .populate({
-        path: "products",
-        populate: { path: "user" },
-      })
-      .populate({ path: "carts", populate: { path: "product" } }),
-  product: (parent, args, context, info) =>
-    Product.findById(args.id).populate({
-      path: "user",
-      populate: { path: "products" },
-    }),
-  products: (parent, args, context, info) =>
-    Product.find({}).populate({
-      path: "user",
-      populate: { path: "products" },
-    }),
+        path: "subject_comments",
+        populate: { path: "subjectId" },
+      }),
+      
+
+  // product: (parent, args, context, info) =>
+  //   Product.findById(args.id).populate({
+  //     path: "user",
+  //     populate: { path: "products" },
+  //   }),
+  // products: (parent, args, context, info) =>
+  //   Product.find({}).populate({
+  //     path: "user",
+  //     populate: { path: "products" },
+  //   }),
 
   //New Project
   subjects: (parent, args, context, info) =>
@@ -46,7 +47,10 @@ const Query = {
   subject: (parent, args, context, info) =>
     Subject.findById(args.id)
       .populate({
-        path: "comments",populate: {path:"owner"}
+        path: "comments", 
+        options:{sort:{"createdAt":"-1"}},
+        populate: {path:"owner"},
+       
       }),
       
   subjectComments: (parent, args, context, info) =>

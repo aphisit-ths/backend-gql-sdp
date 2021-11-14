@@ -23,15 +23,12 @@ const userSchema = new mongoose.Schema({
     requre:true,
     default: false, 
   },
-
   subject_comments: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "SubjectComment",
     },
   ],
-  
-  
   createdAt: { 
       type: Date, 
       require: true, 

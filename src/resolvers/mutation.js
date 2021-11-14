@@ -43,9 +43,29 @@ const Mutation = {
     }
     //Hash
     const password = await bcrypt.hash(args.password, 10);
-    return User.create({ ...args, email, password });
+    return User.create({ ...args, email, password ,isAdmin:false });
   },
-  createProduct: async (parent, args, { userId }, info) => {
+
+  //<=========== ADMIN =========>
+  updateRole:async (parent, args, context, info) => {
+    const {id} = args
+    if (!id) throw new Error("please , provide id field ")
+    //find user in database and check isadmin
+    const user = await User.findById(id);
+    if (!user) throw new Error("user not found.")
+    const roleInfo = {
+      isAdmin: args.isAdmin
+    }
+    
+    //updating user
+    await User.findByIdAndUpdate(id,roleInfo)
+    
+    const updatedUser = User.findById(id)
+    return updatedUser
+  },
+  //<=========== ADMIN =========>
+
+  /** createProduct: async (parent, args, { userId }, info) => {
     //Check if user logged in
     if (!userId) throw new Error("please, log in .");
     if (!args.desc || !args.price || !args.imgUrl) {
@@ -64,8 +84,8 @@ const Mutation = {
       path: "user",
       populate: { path: "products" },
     });
-  },
-  addToCart: async (parent, args, { userId }, info) => {
+  }, */
+  /** addToCart: async (parent, args, { userId }, info) => {
     //Id --> product ID Cart ID
     const { id } = args;
     if (!userId) throw new Error("please, log in .");
@@ -121,8 +141,8 @@ const Mutation = {
     } catch (error) {
       console.log(error);
     }
-  },
-  updateProduct: async (parent, args, { userId }, info) => {
+  }, */
+  /** updateProduct: async (parent, args, { userId }, info) => {
     if (!userId) throw new Error("please, log in .");
 
     const { id, desc, price, imgUrl } = args;
@@ -197,7 +217,8 @@ const Mutation = {
     );
     await User.findByIdAndUpdate(userId, { carts: updatedUserCarts });
     return deletedCart;
-  },
+  }, */
+  
 
   addSubject: async (parent, args, context, info) => {
     const userId = "6148b1fc5d04582b38612c7e";
