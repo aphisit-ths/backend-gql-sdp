@@ -52,5 +52,6 @@ const SubjectCommentSchema = new mongoose.Schema({
     
 
 })
+
 const SubjectComment = mongoose.model("SubjectComment", SubjectCommentSchema);
 export default SubjectComment

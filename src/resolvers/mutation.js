@@ -63,6 +63,13 @@ const Mutation = {
     const updatedUser = User.findById(id)
     return updatedUser
   },
+  deleteUser:async (parent, args, context, info) => {
+    const {userId} = args
+    await SubjectComment.remove({owner:userId})
+    const deletedUser = await User.findByIdAndRemove(userId)
+    return deletedUser
+  },
+
   //<=========== ADMIN =========>
 
   /** createProduct: async (parent, args, { userId }, info) => {

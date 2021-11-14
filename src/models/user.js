@@ -1,7 +1,7 @@
 //mongoose model
 
 import mongoose from "mongoose";
-
+import SubjectComment from "./subject_comment"
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -34,6 +34,12 @@ const userSchema = new mongoose.Schema({
       require: true, 
       default: () => Date.now() },
 });
+
+userSchema.pre('remove',async function(next){
+  const user = this
+  await SubjectComment.deleteMany({"owner":user._id})
+  next()
+})  
 
 const User = mongoose.model("User", userSchema);
 export default User;

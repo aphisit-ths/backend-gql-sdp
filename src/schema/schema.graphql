@@ -14,7 +14,14 @@ type Query {
 type Mutation {
   login(email: String!, password: String!): AuthData
   signup(name: String!, email: String!, password: String!): User
-  updateRole(id:ID!,isAdmin:Boolean!):User
+
+  #admin
+    updateRole(id:ID!,isAdmin:Boolean!):User
+    deleteUser(userId:ID!):User
+
+
+  #admin
+
   # createProduct(desc: String!, price: Float!, imgUrl: String!): Product!
   # addToCart(id: ID!): CartItem!
   # updateProduct(id: ID!, desc: String, price: Float, imgUrl: String): Product!
