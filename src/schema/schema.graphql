@@ -51,6 +51,7 @@ type User {
   products: [Product]
   carts: [CartItem]!
   createdAt: Date!
+  test: String!
 }
 
 type Subject {
