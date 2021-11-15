@@ -149,13 +149,15 @@ const Mutation = {
       console.log(error);
     }
   }, */
+  //------------------------------------------------------------------------------------อัพเดทอยู่นี่เด้อ
   /** updateProduct: async (parent, args, { userId }, info) => {
+   ********************************เราไม่จำเป็นต้องมีส่วนนี้ เพราะเราเป็นแอดมิน
     if (!userId) throw new Error("please, log in .");
 
     const { id, desc, price, imgUrl } = args;
 
     //find product in database
-    const product = await Product.findById(id);
+    
 
     const ownerProduct = product.user;
 
@@ -164,16 +166,26 @@ const Mutation = {
     if (userId !== ownerProduct.toString()) {
       throw new Error("You are not authorized.");
     }
+    ******************************เราไม่จำเป็นต้องมีส่วนนี้ เพราะเราเป็นแอดมิน
+
+    ******************************เริ่มทำส่วนนี้***************************
+    //ค้น database หาวิชาที่จะแก้เพื่อเอาข้อมูลเก่ามาใช้
+    const product = await Product.findById(id);
 
     //From updated information
+    //การอัพเดทไม่ได้บังคับว่าต้องกรอกทุกฟิวด์ เพราะฉนั้นถ้าค่าใดไม่ได้กรอกก็เอาค่าเดิมของมันมา
+    //ทำตาม fomat คล้ายๆ นี้เลย
     const updatedInfo = {
       desc: !!desc ? desc : product.desc,
       price: !!price ? price : product.price,
       imgUrl: !!imgUrl ? imgUrl : product.imgUrl,
     };
     //Update Product in database
+    //ส่วนนี้เป็นส่วน update อย่าลืม await
     await Product.findByIdAndUpdate(id, updatedInfo);
 
+    //ดึงข้อมูลล่าสุดออกมา เพื่อที่จะ return (เวลาใช้ gql มันจะบังคับให้เรา return เสมอ)
+    //แต่ของเราไม่มีการ populate นะดึงเอามาแค่รายวิชาก็พอ
     //find the updated product
     const updatedProduct = await Product.findById(id).populate({
       path: "user",
