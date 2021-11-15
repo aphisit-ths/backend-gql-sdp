@@ -78,7 +78,6 @@ const Mutation = {
 
     //updating user
     await User.findByIdAndUpdate(id, roleInfo);
-
     const updatedUser = User.findById(id);
     return updatedUser;
   },
@@ -87,8 +86,10 @@ const Mutation = {
     const { userId } = args;
     await SubjectComment.deleteMany({ owner: userId });
     const deletedUser = await User.findByIdAndRemove(userId);
+    console.log(deletedUser)
     return deletedUser;
   },
+  
 
   //<=========== ADMIN =========>
 
@@ -261,7 +262,7 @@ const Mutation = {
   //การอัพเดทไม่ได้บังคับว่าต้องกรอกทุกฟิวด์ เพราะฉนั้นถ้าค่าใดไม่ได้กรอกก็เอาค่าเดิมของมันมา
   //ทำตาม fomat คล้ายๆ นี้เลย
   updateSubject: async (parent, args, context, info) => {
-    const { id, course_id, eng_name, thai_name } = args;
+    const { id, course_id, eng_name, thai_name ,isAllowed } = args;
     //ค้น database หาวิชาที่จะแก้เพื่อเอาข้อมูลเก่ามาใช้
     const subject = await Subject.findById(id);
     if (!subject) throw new Error("not found.")
@@ -270,6 +271,7 @@ const Mutation = {
       course_id: !!course_id ? course_id : subject.course_id,
       eng_name: !!eng_name ? eng_name : subject.eng_name,
       thai_name: !!thai_name ? thai_name : subject.thai_name,
+      isAllowed: !!isAllowed ? isAllowed : subject.isAllowed,
     }
     console.log(updatedInfo)
     //Update Subject in database
@@ -298,7 +300,7 @@ const Mutation = {
     if (!course_id || !eng_name || !thai_name) {
       throw new Error("please ! provide all fields");
     }
-    const subject = await Subject.create({ ...args, isAllowed: true });
+    const subject = await Subject.create({ ...args, isAllowed: false });
     return Subject.findById(subject.id);
   },
 

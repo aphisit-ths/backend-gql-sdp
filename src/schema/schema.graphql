@@ -6,7 +6,10 @@ type Query {
   products: [Product]!
   # New Project
   subjects: [Subject]!
+  subjectsAdmin: [Subject]!
   subject(id: ID!): Subject
+
+  
   subjectComments: [SubjectComment]!
   subjectComment(id: ID!): SubjectComment
 }
@@ -38,6 +41,7 @@ type Mutation {
     course_id: String
     eng_name: String
     thai_name: String
+    isAllowed: Boolean
   ): Subject!
   deleteSubject(id: ID!): Subject!
   addSubjectComment(

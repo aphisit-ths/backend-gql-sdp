@@ -47,6 +47,10 @@ const Query = {
 
   //New Project
   subjects: (parent, args, context, info) =>
+    Subject.find({isAllowed:true}).populate({
+      path: "comments",
+    }),
+  subjectsAdmin: (parent, args, context, info) =>
     Subject.find({}).populate({
       path: "comments",
     }),
