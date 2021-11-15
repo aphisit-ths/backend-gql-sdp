@@ -33,6 +33,12 @@ type Mutation {
     eng_name: String!
     thai_name: String!
   ): Subject!
+  updateSubject(
+    id: ID!
+    course_id: String
+    eng_name: String
+    thai_name: String
+  ): Subject!
   deleteSubject(id: ID!): Subject!
   addSubjectComment(
     subjectId: ID!

@@ -257,6 +257,30 @@ const Mutation = {
     return deletedCart;
   }, */
 
+  //การอัพเดทไม่ได้บังคับว่าต้องกรอกทุกฟิวด์ เพราะฉนั้นถ้าค่าใดไม่ได้กรอกก็เอาค่าเดิมของมันมา
+  //ทำตาม fomat คล้ายๆ นี้เลย
+  updateSubject: async (parent, args, context, info) => {
+    const { id, course_id, eng_name, thai_name } = args;
+    //ค้น database หาวิชาที่จะแก้เพื่อเอาข้อมูลเก่ามาใช้
+    const subject = await Subject.findById(id);
+    if (!subject) throw new Error("not found.")
+    //From updated information
+    const updatedInfo = {
+      course_id: !!course_id ? course_id : Subject.course_id,
+      eng_name: !!eng_name ? eng_name : Subject.eng_name,
+      thai_name: !!thai_name ? thai_name : Subject.thai_name,
+    }
+    
+    //Update Subject in database
+    //ส่วนนี้เป็นส่วน update อย่าลืม await
+    await Subject.findByIdAndUpdate(id,updatedInfo)
+
+    //ดึงข้อมูลล่าสุดออกมา เพื่อที่จะ return (เวลาใช้ gql มันจะบังคับให้เรา return เสมอ)
+    //แต่ของเราไม่มีการ populate นะดึงเอามาแค่รายวิชาก็พอ
+    //find the updated subject
+    const updatedSubject = await Subject.findById(id)
+    return updatedSubject
+  },
   addSubject: async (parent, args, context, info) => {
     const userId = "6148b1fc5d04582b38612c7e";
     const { course_id, eng_name, thai_name } = args;
