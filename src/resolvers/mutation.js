@@ -303,7 +303,12 @@ const Mutation = {
     const subject = await Subject.create({ ...args, isAllowed: false });
     return Subject.findById(subject.id);
   },
-
+  deleteSubject:async (parent, args, context, info) => {
+    const {id} = args
+    await SubjectComment.deleteMany({subjectId:id})
+    const deletedSubject = await Subject.findByIdAndRemove(id)
+    return deletedSubject
+  },
   addSubjectComment: async (parent, args, { userId }, info) => {
     //Id คือ Course id
     const { subjectId, comment, grade, year, section } = args;
