@@ -1,14 +1,14 @@
 type Query {
   user: User
+  admin: User
   users: [User]!
   product(id: ID!): Product
   products: [Product]!
   # New Project
-  subjects:[Subject]!
-  subject (id:ID!):Subject
-  
-  subjectComments:[SubjectComment]!
-  subjectComment (id:ID!):SubjectComment
+  subjects: [Subject]!
+  subject(id: ID!): Subject
+  subjectComments: [SubjectComment]!
+  subjectComment(id: ID!): SubjectComment
 }
 
 type Mutation {
@@ -16,9 +16,9 @@ type Mutation {
   signup(name: String!, email: String!, password: String!): User
 
   #admin
-    updateRole(id:ID!,isAdmin:Boolean!):User
-    deleteUser(userId:ID!):User
-
+  updateRole(id: ID!, isAdmin: Boolean!): User
+  deleteUser(userId: ID!): User
+  AdminLogin(email: String!, password: String!): AuthData
 
   #admin
 
@@ -27,7 +27,7 @@ type Mutation {
   # updateProduct(id: ID!, desc: String, price: Float, imgUrl: String): Product!
   # deleteProduct(id: ID!): Product!
   # deleteCart(id: ID!): CartItem!
-  
+
   addSubject(
     course_id: String!
     eng_name: String!
@@ -48,8 +48,6 @@ type Mutation {
 }
 
 scalar Date
-
-
 
 type User {
   id: ID!
@@ -75,7 +73,6 @@ type Subject {
   content_rate: [Int]!
   lecturer_rate: [Int]!
 }
-
 
 type SubjectComment {
   id: ID!
@@ -112,4 +109,3 @@ type AuthData {
   user: User
   jwt: String
 }
-

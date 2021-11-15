@@ -26,6 +26,25 @@ const Mutation = {
     });
     return { user, jwt: token };
   },
+  AdminLogin: async (parent, args, context, info) => {
+    const { email, password } = args;
+    //find user in database
+    const user = await User.findOne({ email }).populate({
+      path: "subject_comments",
+    });
+
+    if (!user) throw new Error("Invalid email or password.");
+    if (!user.isAdmin) throw new Error("You are not authorized.");
+    //Compare Password
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) throw new Error("Invalid email or password.");
+    //Create token
+    const token = jwt.sign({ userId: user.id }, process.env.SECRET, {
+      expiresIn: "7days",
+    });
+    return { user, jwt: token };
+  },
+
   signup: async (parent, args, context, info) => {
     //Trim and Lower Case email
     const email = args.email.trim().toLowerCase();
@@ -43,31 +62,31 @@ const Mutation = {
     }
     //Hash
     const password = await bcrypt.hash(args.password, 10);
-    return User.create({ ...args, email, password ,isAdmin:false });
+    return User.create({ ...args, email, password, isAdmin: false });
   },
 
   //<=========== ADMIN =========>
-  updateRole:async (parent, args, context, info) => {
-    const {id} = args
-    if (!id) throw new Error("please , provide id field ")
+  updateRole: async (parent, args, context, info) => {
+    const { id } = args;
+    if (!id) throw new Error("please , provide id field ");
     //find user in database and check isadmin
     const user = await User.findById(id);
-    if (!user) throw new Error("user not found.")
+    if (!user) throw new Error("user not found.");
     const roleInfo = {
-      isAdmin: args.isAdmin
-    }
-    
+      isAdmin: args.isAdmin,
+    };
+
     //updating user
-    await User.findByIdAndUpdate(id,roleInfo)
-    
-    const updatedUser = User.findById(id)
-    return updatedUser
+    await User.findByIdAndUpdate(id, roleInfo);
+
+    const updatedUser = User.findById(id);
+    return updatedUser;
   },
-  deleteUser:async (parent, args, context, info) => {
-    const {userId} = args
-    await SubjectComment.remove({owner:userId})
-    const deletedUser = await User.findByIdAndRemove(userId)
-    return deletedUser
+  deleteUser: async (parent, args, context, info) => {
+    const { userId } = args;
+    await SubjectComment.remove({ owner: userId });
+    const deletedUser = await User.findByIdAndRemove(userId);
+    return deletedUser;
   },
 
   //<=========== ADMIN =========>
@@ -237,7 +256,6 @@ const Mutation = {
     await User.findByIdAndUpdate(userId, { carts: updatedUserCarts });
     return deletedCart;
   }, */
-  
 
   addSubject: async (parent, args, context, info) => {
     const userId = "6148b1fc5d04582b38612c7e";
@@ -247,30 +265,33 @@ const Mutation = {
     //check course id is already exit?
     const currentSubject = await Subject.find({});
     const isCourseIdExisted =
-      currentSubject.findIndex((subject) => subject.course_id === course_id) >  -1;
+      currentSubject.findIndex((subject) => subject.course_id === course_id) >
+      -1;
 
     if (isCourseIdExisted) throw new Error("this course id is already exist");
 
     if (!course_id || !eng_name || !thai_name) {
       throw new Error("please ! provide all fields");
     }
-    const subject = await Subject.create({ ...args ,isAllowed:true});
-    return Subject.findById(subject.id)
+    const subject = await Subject.create({ ...args, isAllowed: true });
+    return Subject.findById(subject.id);
   },
 
   addSubjectComment: async (parent, args, { userId }, info) => {
     //Id คือ Course id
-    const { subjectId, comment, grade,  year, section } = args;
+    const { subjectId, comment, grade, year, section } = args;
     if (!userId) throw new Error("please, log in .");
 
-    if (!subjectId || !comment || !grade  || !year || !section) {
+    if (!subjectId || !comment || !grade || !year || !section) {
       throw new Error("please provide all required fields");
     }
 
-    const currentSubjects = await Subject.find({})
-    const isExitSubject = await currentSubjects.findIndex((subject) => subject.id === subjectId) > -1;
-    if(!isExitSubject) throw new Error ("This course does not exist ?! ")
-    
+    const currentSubjects = await Subject.find({});
+    const isExitSubject =
+      (await currentSubjects.findIndex((subject) => subject.id === subjectId)) >
+      -1;
+    if (!isExitSubject) throw new Error("This course does not exist ?! ");
+
     const commented = await SubjectComment.create({ ...args, owner: userId });
 
     const user = await User.findById(userId);
@@ -283,14 +304,13 @@ const Mutation = {
     user.save();
 
     const subject = await Subject.findById(subjectId);
-  
-    if  (!subject.comments) {
+
+    if (!subject.comments) {
       subject.comments = [commented];
     } else {
       subject.comments.push(commented);
     }
-    
-    
+
     //add homework_rate to Subject
     if (!subject.homework_rate) {
       subject.homework_rate = [args.homework_rate];
@@ -304,14 +324,14 @@ const Mutation = {
     } else {
       subject.content_rate.push(args.content_rate);
     }
-    
+
     //add homework_rate to Subject
     if (!subject.lecturer_rate) {
       subject.lecturer_rate = [args.lecturer_rate];
     } else {
       subject.lecturer_rate.push(args.lecturer_rate);
     }
-     subject.save();
+    subject.save();
 
     const success = await SubjectComment.findById(commented.id)
       .populate({ path: "subjectId", populate: { path: "comments" } })
