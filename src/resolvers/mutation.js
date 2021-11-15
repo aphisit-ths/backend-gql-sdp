@@ -82,9 +82,10 @@ const Mutation = {
     const updatedUser = User.findById(id);
     return updatedUser;
   },
+  
   deleteUser: async (parent, args, context, info) => {
     const { userId } = args;
-    await SubjectComment.remove({ owner: userId });
+    await SubjectComment.deleteMany({ owner: userId });
     const deletedUser = await User.findByIdAndRemove(userId);
     return deletedUser;
   },
@@ -266,11 +267,11 @@ const Mutation = {
     if (!subject) throw new Error("not found.")
     //From updated information
     const updatedInfo = {
-      course_id: !!course_id ? course_id : Subject.course_id,
-      eng_name: !!eng_name ? eng_name : Subject.eng_name,
-      thai_name: !!thai_name ? thai_name : Subject.thai_name,
+      course_id: !!course_id ? course_id : subject.course_id,
+      eng_name: !!eng_name ? eng_name : subject.eng_name,
+      thai_name: !!thai_name ? thai_name : subject.thai_name,
     }
-    
+    console.log(updatedInfo)
     //Update Subject in database
     //ส่วนนี้เป็นส่วน update อย่าลืม await
     await Subject.findByIdAndUpdate(id,updatedInfo)
