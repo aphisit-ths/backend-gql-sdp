@@ -368,6 +368,11 @@ const Mutation = {
       .populate({ path: "owner", populate: { path: "comments" } });
     return success;
   },
+  deleteComment:async (parent, args, context, info) => {
+    const {id} = args
+    const deleteComment = await SubjectComment.findByIdAndRemove(id)
+    return deleteComment
+  },
 };
 
 export default Mutation;
