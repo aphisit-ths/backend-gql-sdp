@@ -96,6 +96,7 @@ type SubjectComment {
   homework_rate: Int!
   content_rate: Int!
   lecturer_rate: Int!
+  
 }
 
 type Product {

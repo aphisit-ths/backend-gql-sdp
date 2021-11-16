@@ -85,7 +85,7 @@ const Mutation = {
     const { userId } = args;
     await SubjectComment.deleteMany({ owner: userId });
     const deletedUser = await User.findByIdAndRemove(userId);
-    console.log(deletedUser)
+    
     return deletedUser;
   },
   
