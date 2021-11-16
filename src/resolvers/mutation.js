@@ -44,7 +44,6 @@ const Mutation = {
     });
     return { user, jwt: token };
   },
-
   signup: async (parent, args, context, info) => {
     //Trim and Lower Case email
     const email = args.email.trim().toLowerCase();
@@ -296,9 +295,7 @@ const Mutation = {
     const isCourseIdExisted =
       currentSubject.findIndex((subject) => subject.course_id === course_id) >
       -1;
-
     if (isCourseIdExisted) throw new Error("this course id is already exist");
-
     if (!course_id || !eng_name || !thai_name) {
       throw new Error("please ! provide all fields");
     }
