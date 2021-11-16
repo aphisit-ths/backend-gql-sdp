@@ -42,6 +42,7 @@ type Mutation {
     eng_name: String
     thai_name: String
     isAllowed: Boolean
+    report: Boolean
   ): Subject!
   deleteSubject(id: ID!): Subject!
   addSubjectComment(
@@ -96,7 +97,8 @@ type SubjectComment {
   homework_rate: Int!
   content_rate: Int!
   lecturer_rate: Int!
-  
+  report: Boolean!
+
 }
 
 type Product {
@@ -120,3 +122,4 @@ type AuthData {
   user: User
   jwt: String
 }
+
