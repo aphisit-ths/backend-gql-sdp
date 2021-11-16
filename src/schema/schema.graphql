@@ -42,7 +42,6 @@ type Mutation {
     eng_name: String
     thai_name: String
     isAllowed: Boolean
-    report: Boolean
   ): Subject!
   deleteSubject(id: ID!): Subject!
   addSubjectComment(
