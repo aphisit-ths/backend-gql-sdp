@@ -262,7 +262,7 @@ const Mutation = {
   //การอัพเดทไม่ได้บังคับว่าต้องกรอกทุกฟิวด์ เพราะฉนั้นถ้าค่าใดไม่ได้กรอกก็เอาค่าเดิมของมันมา
   //ทำตาม fomat คล้ายๆ นี้เลย
   updateSubject: async (parent, args, context, info) => {
-    const { id, course_id, eng_name, thai_name ,isAllowed } = args;
+    const { id, course_id, eng_name, thai_name ,isAllowed,report } = args;
     //ค้น database หาวิชาที่จะแก้เพื่อเอาข้อมูลเก่ามาใช้
     const subject = await Subject.findById(id);
     if (!subject) throw new Error("not found.")
@@ -272,7 +272,8 @@ const Mutation = {
       course_id: !!course_id ? course_id : subject.course_id,
       eng_name: !!eng_name ? eng_name : subject.eng_name,
       thai_name: !!thai_name ? thai_name : subject.thai_name,
-      isAllowed: args.isAllowed
+      isAllowed: args.isAllowed,
+      report: args.report
     }
     
     //Update Subject in database
@@ -370,6 +371,7 @@ const Mutation = {
       .populate({ path: "subjectId", populate: { path: "comments" } })
       .populate({ path: "owner", populate: { path: "comments" } });
     return success;
+    
   },
   deleteComment:async (parent, args, context, info) => {
     const {id} = args

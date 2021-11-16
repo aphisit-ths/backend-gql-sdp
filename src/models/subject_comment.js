@@ -48,8 +48,12 @@ const SubjectCommentSchema = new mongoose.Schema({
     lecturer_rate:{
         type:Number,
         require:true,
-    },
-    
+    },   
+    report:{
+        type:Boolean,
+        default: true,
+        require:true,
+    }
 
 })
 
