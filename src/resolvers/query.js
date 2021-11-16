@@ -13,6 +13,7 @@ const Query = {
     if (!userId) throw new Error("please ,log in.");
     return User.findById(userId).populate({
       path: "subject_comments",
+      populate: { path: "subjectId" },
     });
   },
   admin: async (parent, args, { userId }, info) => {
