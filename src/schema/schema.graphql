@@ -82,7 +82,6 @@ type Subject {
   homework_rate: [Int]!
   content_rate: [Int]!
   lecturer_rate: [Int]!
-  report: Boolean!
 }
 
 type SubjectComment {
