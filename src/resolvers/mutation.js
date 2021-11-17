@@ -85,7 +85,7 @@ const Mutation = {
     const { userId } = args;
     await SubjectComment.deleteMany({ owner: userId });
     const deletedUser = await User.findByIdAndRemove(userId);
-    console.log(deletedUser)
+    
     return deletedUser;
   },
   
@@ -261,7 +261,7 @@ const Mutation = {
   //การอัพเดทไม่ได้บังคับว่าต้องกรอกทุกฟิวด์ เพราะฉนั้นถ้าค่าใดไม่ได้กรอกก็เอาค่าเดิมของมันมา
   //ทำตาม fomat คล้ายๆ นี้เลย
   updateSubject: async (parent, args, context, info) => {
-    const { id, course_id, eng_name, thai_name ,isAllowed } = args;
+    const { id, course_id, eng_name, thai_name  } = args;
     //ค้น database หาวิชาที่จะแก้เพื่อเอาข้อมูลเก่ามาใช้
     const subject = await Subject.findById(id);
     if (!subject) throw new Error("not found.")
@@ -271,7 +271,7 @@ const Mutation = {
       course_id: !!course_id ? course_id : subject.course_id,
       eng_name: !!eng_name ? eng_name : subject.eng_name,
       thai_name: !!thai_name ? thai_name : subject.thai_name,
-      isAllowed: args.isAllowed
+      isAllowed: args.isAllowed,
     }
     
     //Update Subject in database
@@ -367,12 +367,85 @@ const Mutation = {
       .populate({ path: "subjectId", populate: { path: "comments" } })
       .populate({ path: "owner", populate: { path: "comments" } });
     return success;
+    
   },
   deleteComment:async (parent, args, context, info) => {
-    const {id} = args
+    const {id,userId,subjectId} = args
+
     const deleteComment = await SubjectComment.findByIdAndRemove(id)
-    return deleteComment
+
+    //update user comments
+    const user = await User.findById(userId)
+    const updatedUserComments = user.subject_comments.filter(
+      (commentId) => commentId.toString() !== deleteComment.id.toString()
+    );
+    await User.findByIdAndUpdate(userId, { subject_comments: updatedUserComments });
+    //update subjectComment
+    const subjects = await Subject.findById(subjectId);
+    const updateSubjectComment = subjects.comments.filter(
+      (comment) => comment.toString() !== deleteComment.id.toString()
+    );
+    
+    await Subject.findByIdAndUpdate(subjectId, { comments: updateSubjectComment });
+    
+    
+    return deleteComment;
   },
+  deleteCommentByUser:async (parent, args, {userId}, info) => {
+    if (!userId) throw new Error("please, log in .");
+
+    const {id,subjectId} = args
+
+    const commentForCheckUser = await SubjectComment.findById(id)
+
+    if (userId !== commentForCheckUser.owner.toString()) {
+      throw new Error("You are not authorized.");
+    }
+    
+    const deleteComment = await SubjectComment.findByIdAndRemove(id)
+
+    //update user comments
+    const user = await User.findById(userId)
+    const updatedUserComments = user.subject_comments.filter(
+      (commentId) => commentId.toString() !== deleteComment.id.toString()
+    );
+    await User.findByIdAndUpdate(userId, { subject_comments: updatedUserComments });
+    //update subjectComment
+    const subjects = await Subject.findById(subjectId);
+    const updateSubjectComment = subjects.comments.filter(
+      (comment) => comment.toString() !== deleteComment.id.toString()
+    );
+    
+    await Subject.findByIdAndUpdate(subjectId, { comments: updateSubjectComment });
+    
+    
+    return deleteComment;
+  },
+  /*
+  deleteCart: async (parent, args, { userId }, info) => {
+    if (!userId) throw new Error("please, log in .");
+    const { id } = args;
+
+    //Find Cart form id in database
+    const cart = await CartItem.findById(id);
+    //find user
+
+    const user = await User.findById(userId);
+
+    //Check owner ship of the cart ?
+
+    if (userId !== cart.user.toString()) {
+      throw new Error("You are not authorized.");
+    }
+
+    //Delete
+    const deletedCart = await CartItem.findOneAndRemove(id);
+    const updatedUserCarts = user.carts.filter(
+      (cartId) => cartId.toString() !== deletedCart.id.toString()
+    );
+    await User.findByIdAndUpdate(userId, { carts: updatedUserCarts });
+    return deletedCart;
+  }, */
 };
 
 export default Mutation;

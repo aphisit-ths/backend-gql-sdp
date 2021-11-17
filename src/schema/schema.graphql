@@ -54,7 +54,8 @@ type Mutation {
     content_rate: Int!
     lecturer_rate: Int!
   ): SubjectComment!
-  deleteComment(id: ID!): SubjectComment!
+  deleteComment(id: ID!,userId:String!,subjectId:String!): SubjectComment!
+  deleteCommentByUser(id: ID!,subjectId:String!): SubjectComment!
 }
 
 scalar Date
@@ -96,6 +97,7 @@ type SubjectComment {
   homework_rate: Int!
   content_rate: Int!
   lecturer_rate: Int!
+
 }
 
 type Product {
@@ -119,3 +121,4 @@ type AuthData {
   user: User
   jwt: String
 }
+
