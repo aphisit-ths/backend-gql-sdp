@@ -391,6 +391,36 @@ const Mutation = {
     
     return deleteComment;
   },
+  deleteCommentByUser:async (parent, args, {userId}, info) => {
+    if (!userId) throw new Error("please, log in .");
+
+    const {id,subjectId} = args
+
+    const commentForCheckUser = await SubjectComment.findById(id)
+
+    if (userId !== commentForCheckUser.owner.toString()) {
+      throw new Error("You are not authorized.");
+    }
+    
+    const deleteComment = await SubjectComment.findByIdAndRemove(id)
+
+    //update user comments
+    const user = await User.findById(userId)
+    const updatedUserComments = user.subject_comments.filter(
+      (commentId) => commentId.toString() !== deleteComment.id.toString()
+    );
+    await User.findByIdAndUpdate(userId, { subject_comments: updatedUserComments });
+    //update subjectComment
+    const subjects = await Subject.findById(subjectId);
+    const updateSubjectComment = subjects.comments.filter(
+      (comment) => comment.toString() !== deleteComment.id.toString()
+    );
+    
+    await Subject.findByIdAndUpdate(subjectId, { comments: updateSubjectComment });
+    
+    
+    return deleteComment;
+  },
   /*
   deleteCart: async (parent, args, { userId }, info) => {
     if (!userId) throw new Error("please, log in .");

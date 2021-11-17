@@ -55,6 +55,7 @@ type Mutation {
     lecturer_rate: Int!
   ): SubjectComment!
   deleteComment(id: ID!,userId:String!,subjectId:String!): SubjectComment!
+  deleteCommentByUser(id: ID!,subjectId:String!): SubjectComment!
 }
 
 scalar Date
