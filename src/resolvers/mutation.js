@@ -284,17 +284,33 @@ const Mutation = {
     const updatedSubject = await Subject.findById(id)
     return updatedSubject
   },
-  addSubject: async (parent, args, context, info) => {
-    const userId = "6148b1fc5d04582b38612c7e";
-    const { course_id, eng_name, thai_name } = args;
-    if (!userId) throw new Error("please, log in .");
+  addSubject: async (parent, args, {userId}, info) => {
+    const course_id = args.course_id.trim()
+    const thai_name = args.thai_name.trim()
+    const eng_name = args.eng_name.trim().toLowerCase()
 
+    
+    if (!userId) throw new Error("please, log in .");
+    
     //check course id is already exit?
     const currentSubject = await Subject.find({});
     const isCourseIdExisted =
       currentSubject.findIndex((subject) => subject.course_id === course_id) >
       -1;
     if (isCourseIdExisted) throw new Error("this course id is already exist");
+
+    const currentEngName = await Subject.find({});
+    const isEngNameExisted =
+      currentEngName.findIndex((subject) => subject.eng_name === eng_name) >
+      -1;
+    if (isEngNameExisted) throw new Error("this english name  is already exist");
+
+    const currentThaiName = await Subject.find({});
+    const isThaiNameExisted =
+      currentThaiName.findIndex((subject) => subject.thai_name === thai_name) >
+      -1;
+    if (isThaiNameExisted) throw new Error("this thai name is already exist");
+
     if (!course_id || !eng_name || !thai_name) {
       throw new Error("please ! provide all fields");
     }
