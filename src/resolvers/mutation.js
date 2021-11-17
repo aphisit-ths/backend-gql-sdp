@@ -370,10 +370,52 @@ const Mutation = {
     
   },
   deleteComment:async (parent, args, context, info) => {
-    const {id} = args
+    const {id,userId,subjectId} = args
+
     const deleteComment = await SubjectComment.findByIdAndRemove(id)
-    return deleteComment
+
+    //update user comments
+    const user = await User.findById(userId)
+    const updatedUserComments = user.subject_comments.filter(
+      (commentId) => commentId.toString() !== deleteComment.id.toString()
+    );
+    await User.findByIdAndUpdate(userId, { subject_comments: updatedUserComments });
+    //update subjectComment
+    const subjects = await Subject.findById(subjectId);
+    const updateSubjectComment = subjects.comments.filter(
+      (comment) => comment.toString() !== deleteComment.id.toString()
+    );
+    
+    await Subject.findByIdAndUpdate(subjectId, { comments: updateSubjectComment });
+    
+    
+    return deleteComment;
   },
+  /*
+  deleteCart: async (parent, args, { userId }, info) => {
+    if (!userId) throw new Error("please, log in .");
+    const { id } = args;
+
+    //Find Cart form id in database
+    const cart = await CartItem.findById(id);
+    //find user
+
+    const user = await User.findById(userId);
+
+    //Check owner ship of the cart ?
+
+    if (userId !== cart.user.toString()) {
+      throw new Error("You are not authorized.");
+    }
+
+    //Delete
+    const deletedCart = await CartItem.findOneAndRemove(id);
+    const updatedUserCarts = user.carts.filter(
+      (cartId) => cartId.toString() !== deletedCart.id.toString()
+    );
+    await User.findByIdAndUpdate(userId, { carts: updatedUserCarts });
+    return deletedCart;
+  }, */
 };
 
 export default Mutation;
